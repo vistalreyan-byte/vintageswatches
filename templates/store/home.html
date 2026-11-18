@@ -49,54 +49,66 @@
             </div>
         </div>
 
-        <!-- 3D Perspective Card Showcase -->
-        <div style="perspective: 1200px; display: flex; justify-content: center;" id="heroCardContainer">
+        <!-- Seamless Floating Watch Showcase (No Card Frame) -->
+        <div style="display: flex; justify-content: center; position: relative;" id="heroCardContainer">
             {% set hero_watch = featured_watches[0] if featured_watches else None %}
-            <div id="heroPerspectiveCard" style="background: linear-gradient(145deg, #1c1c21 0%, #121214 100%); border: 1px solid rgba(197, 168, 128, 0.4); border-radius: 16px; padding: 28px; width: 100%; max-width: 420px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 40px rgba(197,168,128,0.12); transform: rotateY(-8deg) rotateX(4deg); transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
-                    <span style="font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--color-gold); font-weight: 700;">
-                        <i class="fas fa-crown" style="margin-right: 4px;"></i> Curated Highlight
+            <div id="heroPerspectiveCard" style="width: 100%; max-width: 440px; position: relative; background: transparent; border: none; box-shadow: none; padding: 0;">
+                
+                <!-- Floating Top Badges -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                    <span style="font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--color-gold); font-weight: 700; display: inline-flex; align-items: center; gap: 6px; background: rgba(197, 168, 128, 0.12); border: 1px solid rgba(197, 168, 128, 0.3); padding: 5px 14px; border-radius: 20px;">
+                        <i class="fas fa-crown"></i> Curated Highlight
                     </span>
-                    <span class="badge badge-success" style="font-size: 11px; padding: 4px 10px;">
+                    <span class="badge badge-success" style="font-size: 11px; padding: 5px 12px; border-radius: 20px;">
                         {% if hero_watch and hero_watch.stock > 0 %}{{ hero_watch.stock }} in Showroom{% else %}Verified Certified{% endif %}
                     </span>
                 </div>
 
-                <!-- Showcase Image with ambient gold halo -->
-                <div style="width: 100%; height: 280px; background: #0c0c0e; border-radius: 10px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; border: 1px solid rgba(197,168,128,0.2); margin-bottom: 20px; box-shadow: inset 0 0 30px rgba(0,0,0,0.8);">
-                    <div style="position: absolute; width: 180px; height: 180px; background: radial-gradient(circle, rgba(197, 168, 128, 0.25) 0%, rgba(0,0,0,0) 70%); border-radius: 50%; pointer-events: none;"></div>
+                <!-- Floating Timepiece Image (Directly on Hero Background) -->
+                <div style="position: relative; width: 100%; min-height: 330px; display: flex; align-items: center; justify-content: center; margin: 10px 0 24px 0;">
+                    <!-- Ambient Radial Gold Halo behind watch -->
+                    <div style="position: absolute; width: 340px; height: 340px; background: radial-gradient(circle, rgba(197, 168, 128, 0.3) 0%, rgba(197, 168, 128, 0.08) 50%, rgba(0,0,0,0) 70%); border-radius: 50%; pointer-events: none; filter: blur(12px);"></div>
+                    
                     {% if hero_watch and hero_watch.image %}
-                    <img src="{{ url_for('static', filename='uploads/watches/' + hero_watch.image) }}" alt="{{ hero_watch.brand }} {{ hero_watch.model }}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);" class="hero-watch-img">
+                    <a href="{{ url_for('watch_detail', watch_id=hero_watch.watch_id) }}" style="display: inline-block; position: relative; z-index: 2; text-decoration: none;">
+                        <img src="{{ url_for('static', filename='uploads/watches/' + hero_watch.image) }}" 
+                             alt="{{ hero_watch.brand }} {{ hero_watch.model }}" 
+                             style="max-width: 330px; max-height: 340px; width: 100%; height: auto; object-fit: contain; border-radius: 12px; filter: drop-shadow(0 20px 30px rgba(0,0,0,0.85)); transition: transform 0.4s ease, filter 0.4s ease;" 
+                             class="hero-watch-floating-img">
+                    </a>
                     {% else %}
-                    <div style="text-align: center;">
-                        <i class="fas fa-clock" style="font-size: 80px; color: var(--color-gold); filter: drop-shadow(0 0 15px rgba(197,168,128,0.4));"></i>
+                    <div style="text-align: center; position: relative; z-index: 2;">
+                        <i class="fas fa-clock" style="font-size: 80px; color: var(--color-gold); filter: drop-shadow(0 0 20px rgba(197,168,128,0.5));"></i>
                         <div style="font-size: 11px; color: #71717a; margin-top: 14px; letter-spacing: 1px; text-transform: uppercase;">Certified Horology</div>
                     </div>
                     {% endif %}
-                    <div style="position: absolute; bottom: 12px; left: 12px;">
-                        <span class="badge" style="background: rgba(0,0,0,0.8); color: var(--color-gold); border: 1px solid rgba(197,168,128,0.3); font-size: 11px;">
+
+                    <!-- Condition Badge floating at bottom of watch -->
+                    <div style="position: absolute; bottom: 8px; right: 16px; z-index: 3;">
+                        <span class="badge" style="background: rgba(18, 18, 20, 0.85); color: var(--color-gold); border: 1px solid rgba(197,168,128,0.4); font-size: 11px; backdrop-filter: blur(4px); padding: 4px 10px; border-radius: 12px;">
                             {{ hero_watch.condition_status if hero_watch else 'Excellent' }} Grade
                         </span>
                     </div>
                 </div>
 
-                <div>
-                    <h3 style="font-family: 'Playfair Display', serif; font-size: 24px; color: #fff; margin: 0 0 4px 0;">
+                <!-- Floating Timepiece Details & Actions (Direct on Hero Background) -->
+                <div style="position: relative; z-index: 2;">
+                    <h3 style="font-family: 'Playfair Display', serif; font-size: 26px; color: #fff; margin: 0 0 4px 0; font-weight: 600; letter-spacing: 0.5px;">
                         {{ hero_watch.brand if hero_watch else 'Rolex' }} {{ hero_watch.model if hero_watch else 'Submariner Date' }}
                     </h3>
-                    <p style="font-size: 13px; color: #a1a1aa; margin: 0 0 16px 0;">
-                        Ref. {{ hero_watch.reference_number if hero_watch else '116610LN' }} • {{ hero_watch.movement if hero_watch else 'Automatic 3135' }}
+                    <p style="font-size: 13px; color: #a1a1aa; margin: 0 0 18px 0;">
+                        Ref. {{ hero_watch.reference_number if hero_watch else '116610LN' }} • {{ hero_watch.movement if hero_watch else 'Automatic' }}
                     </p>
                     
-                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 16px;">
                         <div>
-                            <span style="font-size: 11px; color: #71717a; text-transform: uppercase; letter-spacing: 0.5px;">Direct Value</span>
-                            <div style="font-size: 22px; font-weight: 700; color: #fff;">
-                                ₱ {{ "{:,.2f}".format(hero_watch.selling_price) if hero_watch else '450,000.00' }}
+                            <span style="font-size: 11px; color: #71717a; text-transform: uppercase; letter-spacing: 0.8px;">Direct Value</span>
+                            <div style="font-size: 24px; font-weight: 700; color: #fff; letter-spacing: 0.5px;">
+                                ₱ {{ "{:,.2f}".format(hero_watch.selling_price) if hero_watch else '280,000.00' }}
                             </div>
                         </div>
-                        <a href="{{ url_for('watch_detail', watch_id=hero_watch.watch_id) if hero_watch else url_for('shop_catalog') }}" class="btn btn-sm btn-primary" style="background: var(--color-gold); color: #121212; font-weight: 600; padding: 9px 18px; border-radius: 4px; box-shadow: 0 4px 12px rgba(197,168,128,0.3);">
-                            Inspect Piece <i class="fas fa-arrow-right" style="margin-left: 4px; font-size: 11px;"></i>
+                        <a href="{{ url_for('watch_detail', watch_id=hero_watch.watch_id) if hero_watch else url_for('shop_catalog') }}" class="btn btn-sm btn-primary" style="background: var(--color-gold); color: #121212; font-weight: 600; padding: 10px 22px; border-radius: 4px; box-shadow: 0 6px 18px rgba(197,168,128,0.3); text-decoration: none;">
+                            Inspect Piece <i class="fas fa-arrow-right" style="margin-left: 6px; font-size: 11px;"></i>
                         </a>
                     </div>
                 </div>

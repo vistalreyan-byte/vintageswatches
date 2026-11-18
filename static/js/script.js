@@ -351,29 +351,27 @@ document.addEventListener('DOMContentLoaded', () => {
         quantityInput.addEventListener('input', calculateTotal);
     }
 
-    // 13. Interactive 3D Perspective Card Tilt (Storefront Hero)
+    // 13. Interactive Floating Watch Showcase (Storefront Hero)
     const heroCardContainer = document.getElementById('heroCardContainer');
-    const heroCard = document.getElementById('heroPerspectiveCard');
+    const floatingImg = document.querySelector('.hero-watch-floating-img');
 
-    if (heroCardContainer && heroCard) {
+    if (heroCardContainer && floatingImg) {
         heroCardContainer.addEventListener('mousemove', (e) => {
-            const rect = heroCard.getBoundingClientRect();
+            const rect = heroCardContainer.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
             
             const centerX = rect.width / 2;
             const centerY = rect.height / 2;
             
-            const rotateX = ((y - centerY) / centerY) * -10;
-            const rotateY = ((x - centerX) / centerX) * 10;
+            const moveX = ((x - centerX) / centerX) * 8;
+            const moveY = ((y - centerY) / centerY) * 8;
             
-            heroCard.style.transform = `rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale3d(1.02, 1.02, 1.02)`;
-            heroCard.style.boxShadow = `0 30px 60px -10px rgba(0,0,0,0.7), 0 0 50px rgba(197,168,128,0.2)`;
+            floatingImg.style.transform = `translate(${moveX.toFixed(1)}px, ${moveY.toFixed(1)}px) scale(1.03)`;
         });
 
         heroCardContainer.addEventListener('mouseleave', () => {
-            heroCard.style.transform = 'rotateY(-8deg) rotateX(4deg) scale3d(1, 1, 1)';
-            heroCard.style.boxShadow = '0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 40px rgba(197,168,128,0.12)';
+            floatingImg.style.transform = 'translate(0px, 0px) scale(1)';
         });
     }
 });
