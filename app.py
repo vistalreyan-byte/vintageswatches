@@ -24,6 +24,25 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+DEFAULT_WATCH_IMAGES = {
+    1: 'rolex_submariner_116610ln.jpg',
+    2: 'omega_seamaster_21030422001001.jpg',
+    3: 'seiko_presage_srpb43j1.jpg',
+    4: 'tissot_prx_t1374071105100.jpg',
+    5: 'citizen_ca0690_88e.jpg',
+    6: 'casio_gg1000_1a3.jpg',
+    7: 'orient_fac08003a0.jpg',
+    8: 'longines_l37814566.jpg',
+    9: 'hamilton_h70455553.jpg',
+    10: 'tag_heuer_war211a_fc6180.jpg'
+}
+
+def attach_watch_image(w):
+    if isinstance(w, dict):
+        if not w.get('image'):
+            w['image'] = DEFAULT_WATCH_IMAGES.get(w.get('watch_id'))
+    return w
+
 # ==========================================
 # AUTHENTICATION HELPERS
 # ==========================================
@@ -80,6 +99,7 @@ def get_cart_details():
         """, (watch_id,))
 
         if watch:
+            watch = attach_watch_image(watch)
             available_stock = int(watch['stock'])
             if available_stock <= 0:
                 cart.pop(watch_id_str, None)
@@ -121,9 +141,11 @@ def index():
         LEFT JOIN inventory i ON w.watch_id = i.watch_id AND i.inventory_status = 'In Stock'
         WHERE w.status = 'Available'
         GROUP BY w.watch_id
-        ORDER BY w.watch_id DESC
+        ORDER BY w.watch_id ASC
         LIMIT 6
     """)
+    for w in featured_watches:
+        attach_watch_image(w)
     brands = db.fetch_all("SELECT DISTINCT brand FROM watches ORDER BY brand")
     return render_template('store/home.html', featured_watches=featured_watches, brands=brands)
 
@@ -162,6 +184,8 @@ def shop_catalog():
         query += " ORDER BY w.watch_id DESC"
 
     watches_list = db.fetch_all(query, tuple(params))
+    for w in watches_list:
+        attach_watch_image(w)
     all_brands = db.fetch_all("SELECT DISTINCT brand FROM watches ORDER BY brand")
     all_movements = db.fetch_all("SELECT DISTINCT movement FROM watches WHERE movement IS NOT NULL AND movement != '' ORDER BY movement")
 
@@ -189,6 +213,7 @@ def watch_detail(watch_id):
         flash("The requested timepiece could not be found.", "error")
         return redirect(url_for('shop_catalog'))
 
+    watch = attach_watch_image(watch)
     related_watches = db.fetch_all("""
         SELECT w.*, COALESCE(SUM(i.quantity), 0) as stock 
         FROM watches w
@@ -197,6 +222,8 @@ def watch_detail(watch_id):
         GROUP BY w.watch_id
         LIMIT 3
     """, (watch['brand'], watch_id))
+    for rw in related_watches:
+        attach_watch_image(rw)
 
     return render_template('store/watch_detail.html', watch=watch, related_watches=related_watches)
 
@@ -550,6 +577,8 @@ def watches():
         
     query += " GROUP BY w.watch_id ORDER BY w.watch_id DESC"
     watches_list = db.fetch_all(query, tuple(params))
+    for w in watches_list:
+        attach_watch_image(w)
     brands = db.fetch_all("SELECT DISTINCT brand FROM watches ORDER BY brand")
     
     return render_template('watches.html', watches=watches_list, search=search, brand=brand, brands=brands)

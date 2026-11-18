@@ -71,14 +71,41 @@ def prepare_query(query, is_sqlite):
     return query
 
 def init_db():
-    """Seeds tables if needed."""
+    """Seeds tables and ensures watch images and descriptions are linked."""
     conn = get_db_connection()
     if not conn:
         return False
 
     if is_sqlite_conn(conn):
-        # SQLite already seeded via vintage_watches.db
-        conn.close()
+        try:
+            cursor = conn.cursor()
+            cursor.execute("PRAGMA table_info(watches)")
+            cols = [r[1] for r in cursor.fetchall()]
+            if 'image' not in cols:
+                cursor.execute("ALTER TABLE watches ADD COLUMN image TEXT")
+            if 'description' not in cols:
+                cursor.execute("ALTER TABLE watches ADD COLUMN description TEXT")
+
+            image_map = {
+                1: ('rolex_submariner_116610ln.jpg', 'Iconic luxury diving watch with black Cerachrom bezel and robust Oystersteel bracelet.'),
+                2: ('omega_seamaster_21030422001001.jpg', 'Legendary maritime timepiece with laser-engraved wave dial and Co-Axial Master Chronometer.'),
+                3: ('seiko_presage_srpb43j1.jpg', 'Elegant dress watch inspired by the glamour of cocktail lounges with radiant sunburst dial.'),
+                4: ('tissot_prx_t1374071105100.jpg', 'Retro 1970s integrated bracelet sport watch powered by an 80-hour Powermatic movement.'),
+                5: ('citizen_ca0690_88e.jpg', 'Solar-powered aviator chronograph with perpetual Eco-Drive technology and compass bezel.'),
+                6: ('casio_gg1000_1a3.jpg', 'Tough Master of G mud-resistant tactical timepiece with Twin Sensor compass and thermometer.'),
+                7: ('orient_fac08003a0.jpg', 'Classic vintage dress watch with domed crystal, roman numerals, and exhibition caseback.'),
+                8: ('longines_l37814566.jpg', 'High-performance Swiss diver with polished ceramic bezel and 300-meter water resistance.'),
+                9: ('hamilton_h70455553.jpg', 'Authentic military heritage field watch featuring a bold dial and rugged leather strap.'),
+                10: ('tag_heuer_war211a_fc6180.jpg', 'Prestige Swiss motor-racing inspired automatic watch with clean black dial and alligator strap.')
+            }
+            for w_id, (img, desc) in image_map.items():
+                cursor.execute("UPDATE watches SET image = ?, description = ? WHERE watch_id = ?", (img, desc, w_id))
+            conn.commit()
+            cursor.close()
+        except Exception as e:
+            print(f"Auto-migration error: {e}")
+        finally:
+            conn.close()
         return True
 
     try:
