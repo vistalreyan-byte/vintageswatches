@@ -9,14 +9,4 @@ services:
       - key: PYTHON_VERSION
         value: 3.11.9
       - key: SECRET_KEY
-        value: supersecretkey_vintage_watches_2026
-      - key: DB_HOST
-        sync: false
-      - key: DB_USER
-        sync: false
-      - key: DB_PASSWORD
-        sync: false
-      - key: DB_NAME
-        sync: false
-      - key: DB_PORT
-        sync: false
+        generateValue: true
