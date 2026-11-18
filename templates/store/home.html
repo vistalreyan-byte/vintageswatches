@@ -1,0 +1,325 @@
+{% extends "store/layout.html" %}
+
+{% block title %}Vintage Watches - Certified Luxury & Heritage Timepieces{% endblock %}
+
+{% block content %}
+<!-- Luxury 3D Hero Section -->
+<section style="background: radial-gradient(circle at 70% 30%, #1e1e24 0%, #0c0c0e 100%); color: white; padding: 90px 24px 100px 24px; position: relative; overflow: hidden;">
+    <!-- Subtle luxury glow effect -->
+    <div style="position: absolute; right: 5%; top: 10%; width: 450px; height: 450px; background: radial-gradient(circle, rgba(197, 168, 128, 0.12) 0%, rgba(0,0,0,0) 70%); border-radius: 50%; pointer-events: none;"></div>
+
+    <div style="max-width: 1240px; margin: 0 auto; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 60px; align-items: center; position: relative; z-index: 2;">
+        <div>
+            <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(197, 168, 128, 0.12); border: 1px solid rgba(197, 168, 128, 0.3); padding: 6px 14px; border-radius: 20px; font-size: 12px; color: var(--color-gold); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 24px;">
+                <i class="fas fa-certificate"></i> Curated Horological Heritage
+            </div>
+            
+            <h1 style="font-family: 'Playfair Display', serif; font-size: 54px; line-height: 1.15; color: #fff; margin: 0 0 20px 0; font-weight: 700;">
+                Timeless Precision.<br>
+                <span style="color: var(--color-gold); font-style: italic;">Rare Provenance.</span>
+            </h1>
+            
+            <p style="font-size: 17px; line-height: 1.7; color: #a1a1aa; max-width: 520px; margin-bottom: 36px; font-weight: 300;">
+                Discover master-authenticated vintage timepieces from Rolex, Omega, Patek Philippe, and Seiko. Every piece tells an extraordinary story of craftsmanship and legacy.
+            </p>
+
+            <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+                <a href="{{ url_for('shop_catalog') }}" class="btn btn-primary" style="background: var(--color-gold); color: #121212; font-weight: 600; padding: 14px 32px; font-size: 15px; border-radius: 4px; box-shadow: 0 8px 24px rgba(197,168,128,0.25);">
+                    <i class="fas fa-compass"></i> Explore Catalog
+                </a>
+                <a href="#services" class="btn btn-outline" style="border-color: rgba(255,255,255,0.25); color: #fff; padding: 14px 28px; font-size: 15px; border-radius: 4px;">
+                    <i class="fas fa-tools"></i> Atelier Services
+                </a>
+            </div>
+
+            <!-- Trust Badges -->
+            <div style="display: flex; gap: 36px; margin-top: 48px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 28px;">
+                <div>
+                    <div style="font-size: 20px; font-weight: 700; color: #fff;">100%</div>
+                    <div style="font-size: 12px; color: #71717a; text-transform: uppercase; letter-spacing: 0.5px;">Authenticity Guaranteed</div>
+                </div>
+                <div>
+                    <div style="font-size: 20px; font-weight: 700; color: #fff;">12-Mo</div>
+                    <div style="font-size: 12px; color: #71717a; text-transform: uppercase; letter-spacing: 0.5px;">Mechanical Warranty</div>
+                </div>
+                <div>
+                    <div style="font-size: 20px; font-weight: 700; color: #fff;">Insured</div>
+                    <div style="font-size: 12px; color: #71717a; text-transform: uppercase; letter-spacing: 0.5px;">Nationwide Delivery</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3D Perspective Card Showcase -->
+        <div style="perspective: 1200px; display: flex; justify-content: center;" id="heroCardContainer">
+            {% set hero_watch = featured_watches[0] if featured_watches else None %}
+            <div id="heroPerspectiveCard" style="background: linear-gradient(145deg, #1c1c21 0%, #121214 100%); border: 1px solid rgba(197, 168, 128, 0.4); border-radius: 16px; padding: 28px; width: 100%; max-width: 420px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 40px rgba(197,168,128,0.12); transform: rotateY(-8deg) rotateX(4deg); transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+                    <span style="font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--color-gold); font-weight: 700;">
+                        <i class="fas fa-crown" style="margin-right: 4px;"></i> Curated Highlight
+                    </span>
+                    <span class="badge badge-success" style="font-size: 11px; padding: 4px 10px;">
+                        {% if hero_watch and hero_watch.stock > 0 %}{{ hero_watch.stock }} in Showroom{% else %}Verified Certified{% endif %}
+                    </span>
+                </div>
+
+                <!-- Showcase Image with ambient gold halo -->
+                <div style="width: 100%; height: 280px; background: #0c0c0e; border-radius: 10px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; border: 1px solid rgba(197,168,128,0.2); margin-bottom: 20px; box-shadow: inset 0 0 30px rgba(0,0,0,0.8);">
+                    <div style="position: absolute; width: 180px; height: 180px; background: radial-gradient(circle, rgba(197, 168, 128, 0.25) 0%, rgba(0,0,0,0) 70%); border-radius: 50%; pointer-events: none;"></div>
+                    {% if hero_watch and hero_watch.image %}
+                    <img src="{{ url_for('static', filename='uploads/watches/' + hero_watch.image) }}" alt="{{ hero_watch.brand }} {{ hero_watch.model }}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);" class="hero-watch-img">
+                    {% else %}
+                    <div style="text-align: center;">
+                        <i class="fas fa-clock" style="font-size: 80px; color: var(--color-gold); filter: drop-shadow(0 0 15px rgba(197,168,128,0.4));"></i>
+                        <div style="font-size: 11px; color: #71717a; margin-top: 14px; letter-spacing: 1px; text-transform: uppercase;">Certified Horology</div>
+                    </div>
+                    {% endif %}
+                    <div style="position: absolute; bottom: 12px; left: 12px;">
+                        <span class="badge" style="background: rgba(0,0,0,0.8); color: var(--color-gold); border: 1px solid rgba(197,168,128,0.3); font-size: 11px;">
+                            {{ hero_watch.condition_status if hero_watch else 'Excellent' }} Grade
+                        </span>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 style="font-family: 'Playfair Display', serif; font-size: 24px; color: #fff; margin: 0 0 4px 0;">
+                        {{ hero_watch.brand if hero_watch else 'Rolex' }} {{ hero_watch.model if hero_watch else 'Submariner Date' }}
+                    </h3>
+                    <p style="font-size: 13px; color: #a1a1aa; margin: 0 0 16px 0;">
+                        Ref. {{ hero_watch.reference_number if hero_watch else '116610LN' }} • {{ hero_watch.movement if hero_watch else 'Automatic 3135' }}
+                    </p>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 16px;">
+                        <div>
+                            <span style="font-size: 11px; color: #71717a; text-transform: uppercase; letter-spacing: 0.5px;">Direct Value</span>
+                            <div style="font-size: 22px; font-weight: 700; color: #fff;">
+                                ₱ {{ "{:,.2f}".format(hero_watch.selling_price) if hero_watch else '450,000.00' }}
+                            </div>
+                        </div>
+                        <a href="{{ url_for('watch_detail', watch_id=hero_watch.watch_id) if hero_watch else url_for('shop_catalog') }}" class="btn btn-sm btn-primary" style="background: var(--color-gold); color: #121212; font-weight: 600; padding: 9px 18px; border-radius: 4px; box-shadow: 0 4px 12px rgba(197,168,128,0.3);">
+                            Inspect Piece <i class="fas fa-arrow-right" style="margin-left: 4px; font-size: 11px;"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Brand Filter Bar -->
+<section style="background: #111113; border-bottom: 1px solid rgba(255,255,255,0.06); padding: 20px 24px;">
+    <div style="max-width: 1240px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+        <span style="font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: #71717a; font-weight: 600;">
+            Featured Ateliers:
+        </span>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+            {% for b in brands %}
+            <a href="{{ url_for('shop_catalog', brand=b.brand) }}" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); color: #d4d4d8; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; text-decoration: none; transition: all 0.2s;" onmouseover="this.style.borderColor='var(--color-gold)'; this.style.color='#fff';" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.color='#d4d4d8';">
+                {{ b.brand }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Featured Timepieces Section -->
+<section style="max-width: 1240px; margin: 0 auto; padding: 80px 24px;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px;">
+        <div>
+            <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--color-gold); font-weight: 700; margin-bottom: 6px;">
+                Curated Collection
+            </div>
+            <h2 style="font-family: 'Playfair Display', serif; font-size: 36px; margin: 0; color: #121212;">
+                Featured Timepieces
+            </h2>
+        </div>
+        <a href="{{ url_for('shop_catalog') }}" class="btn btn-outline" style="font-size: 14px;">
+            View All Watches ({{ featured_watches | length }}+) <i class="fas fa-arrow-right" style="margin-left: 6px;"></i>
+        </a>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 30px;">
+        {% for watch in featured_watches %}
+        <div class="watch-card">
+            <div class="watch-card-img">
+                {% if watch.image %}
+                <img src="{{ url_for('static', filename='uploads/watches/' + watch.image) }}" alt="{{ watch.brand }} {{ watch.model }}">
+                {% else %}
+                <div style="text-align: center; color: #fff;">
+                    <i class="fas fa-clock" style="font-size: 48px; color: var(--color-gold);"></i>
+                    <div style="font-size: 11px; color: #71717a; margin-top: 8px;">{{ watch.brand }}</div>
+                </div>
+                {% endif %}
+
+                <div style="position: absolute; top: 12px; left: 12px;">
+                    <span class="badge" style="background: rgba(0,0,0,0.7); color: #fff; border: 1px solid rgba(255,255,255,0.2); font-size: 11px;">
+                        {{ watch.condition_status }}
+                    </span>
+                </div>
+                
+                <div style="position: absolute; top: 12px; right: 12px;">
+                    {% if watch.stock > 0 %}
+                    <span class="badge badge-success" style="font-size: 11px;">{{ watch.stock }} In Stock</span>
+                    {% else %}
+                    <span class="badge badge-danger" style="font-size: 11px;">Sold Out</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="watch-card-body">
+                <span class="watch-brand-tag">{{ watch.brand }}</span>
+                <a href="{{ url_for('watch_detail', watch_id=watch.watch_id) }}" class="watch-card-title">
+                    {{ watch.model }}
+                </a>
+                <span class="watch-card-ref">Ref. {{ watch.reference_number }} • {{ watch.movement }}</span>
+
+                <p style="font-size: 13px; line-height: 1.5; color: #52525b; margin: 0 0 16px 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                    {{ watch.description or 'Exquisite vintage horology certified and inspected by our master watchmakers.' }}
+                </p>
+
+                <div class="watch-card-price">
+                    <div>
+                        <span style="font-size: 11px; color: #71717a; text-transform: uppercase; display: block;">Price</span>
+                        ₱ {{ "{:,.2f}".format(watch.selling_price) }}
+                    </div>
+                    <span style="font-size: 12px; color: #71717a;">{{ watch.year_aquired }}</span>
+                </div>
+
+                <div class="watch-card-actions">
+                    <a href="{{ url_for('watch_detail', watch_id=watch.watch_id) }}" class="btn btn-outline" style="flex: 1; text-align: center; justify-content: center; font-size: 13px;">
+                        Details
+                    </a>
+                    {% if watch.stock > 0 %}
+                    <form action="{{ url_for('cart_add', watch_id=watch.watch_id) }}" method="POST" style="flex: 1; display: flex;">
+                        <input type="hidden" name="quantity" value="1">
+                        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; font-size: 13px; background: var(--color-gold); color: #121212; border-color: var(--color-gold);">
+                            <i class="fas fa-cart-plus"></i> Add
+                        </button>
+                    </form>
+                    {% else %}
+                    <button class="btn btn-outline" disabled style="flex: 1; opacity: 0.5; justify-content: center; font-size: 13px;">
+                        Sold Out
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Atelier Services Section -->
+<section id="services" style="background: #141416; color: white; padding: 90px 24px;">
+    <div style="max-width: 1240px; margin: 0 auto;">
+        <div style="text-align: center; max-width: 650px; margin: 0 auto 60px auto;">
+            <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--color-gold); font-weight: 700; margin-bottom: 8px;">
+                Atelier Workshop
+            </div>
+            <h2 style="font-family: 'Playfair Display', serif; font-size: 38px; color: #fff; margin-bottom: 16px;">
+                Watch Care & Restoration
+            </h2>
+            <p style="font-size: 15px; color: #a1a1aa; line-height: 1.6;">
+                Our certified horologists utilize authentic precision tools and genuine parts to service, restore, and maintain your luxury timepieces.
+            </p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px;">
+            <div style="background: #1c1c20; border: 1px solid rgba(255,255,255,0.06); padding: 32px; border-radius: 8px;">
+                <div style="width: 50px; height: 50px; border-radius: 8px; background: rgba(197, 168, 128, 0.15); display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                    <i class="fas fa-cog fa-spin" style="color: var(--color-gold); font-size: 22px;"></i>
+                </div>
+                <h3 style="color: #fff; font-size: 18px; margin-bottom: 10px;">Mechanical Overhaul</h3>
+                <p style="color: #a1a1aa; font-size: 13px; line-height: 1.6;">
+                    Complete disassembly of the movement, ultrasonic ultrasonic bath cleaning, re-lubrication with Swiss horological oils, and multi-position calibration.
+                </p>
+            </div>
+
+            <div style="background: #1c1c20; border: 1px solid rgba(255,255,255,0.06); padding: 32px; border-radius: 8px;">
+                <div style="width: 50px; height: 50px; border-radius: 8px; background: rgba(197, 168, 128, 0.15); display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                    <i class="fas fa-sparkles" style="color: var(--color-gold); font-size: 22px;"></i>
+                </div>
+                <h3 style="color: #fff; font-size: 18px; margin-bottom: 10px;">Polishing & Lapping</h3>
+                <p style="color: #a1a1aa; font-size: 13px; line-height: 1.6;">
+                    Hand-finishing cases and bracelets preserving factory chamfers, brushed satin grains, and mirror bevels without losing case geometry.
+                </p>
+            </div>
+
+            <div style="background: #1c1c20; border: 1px solid rgba(255,255,255,0.06); padding: 32px; border-radius: 8px;">
+                <div style="width: 50px; height: 50px; border-radius: 8px; background: rgba(197, 168, 128, 0.15); display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                    <i class="fas fa-tint" style="color: var(--color-gold); font-size: 22px;"></i>
+                </div>
+                <h3 style="color: #fff; font-size: 18px; margin-bottom: 10px;">Waterproof & Gaskets</h3>
+                <p style="color: #a1a1aa; font-size: 13px; line-height: 1.6;">
+                    Complete seal replacements and wet/dry vacuum pressure testing to ensure depth-rated water resistance according to ISO standards.
+                </p>
+            </div>
+
+            <div style="background: #1c1c20; border: 1px solid rgba(255,255,255,0.06); padding: 32px; border-radius: 8px;">
+                <div style="width: 50px; height: 50px; border-radius: 8px; background: rgba(197, 168, 128, 0.15); display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                    <i class="fas fa-shield-check" style="color: var(--color-gold); font-size: 22px;"></i>
+                </div>
+                <h3 style="color: #fff; font-size: 18px; margin-bottom: 10px;">Appraisal & Certification</h3>
+                <p style="color: #a1a1aa; font-size: 13px; line-height: 1.6;">
+                    Laser serial inspection, dial originality assessment, caliber matching, and issuance of formal Certificate of Authenticity for insurance.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Heritage Section -->
+<section id="heritage" style="max-width: 1240px; margin: 0 auto; padding: 90px 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;">
+    <div>
+        <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--color-gold); font-weight: 700; margin-bottom: 8px;">
+            The Vintage Watches Commitment
+        </div>
+        <h2 style="font-family: 'Playfair Display', serif; font-size: 38px; margin-bottom: 20px; color: #121212;">
+            Preserving History One Movement At A Time
+        </h2>
+        <p style="font-size: 15px; line-height: 1.7; color: #52525b; margin-bottom: 16px;">
+            Founded with a profound reverence for mid-century and neo-vintage horology, our boutique bridges the gap between distinguished collectors and rare mechanical masterpieces.
+        </p>
+        <p style="font-size: 15px; line-height: 1.7; color: #52525b; margin-bottom: 28px;">
+            We do not simply trade watches—we curate heirlooms. Each timepiece undergoing our rigorous intake process is physically evaluated across 32 individual mechanical and cosmetic checkpoints.
+        </p>
+        <div style="display: flex; gap: 24px;">
+            <div>
+                <h4 style="font-size: 28px; margin: 0; color: #121212; font-family: 'Playfair Display', serif;">500+</h4>
+                <p style="font-size: 13px; color: #71717a; margin: 4px 0 0 0;">Timepieces Curated</p>
+            </div>
+            <div>
+                <h4 style="font-size: 28px; margin: 0; color: #121212; font-family: 'Playfair Display', serif;">100%</h4>
+                <p style="font-size: 13px; color: #71717a; margin: 4px 0 0 0;">Authenticity Record</p>
+            </div>
+            <div>
+                <h4 style="font-size: 28px; margin: 0; color: #121212; font-family: 'Playfair Display', serif;">10+ Yrs</h4>
+                <p style="font-size: 13px; color: #71717a; margin: 4px 0 0 0;">Horological Expertise</p>
+            </div>
+        </div>
+    </div>
+
+    <div style="background: #141416; border-radius: 12px; padding: 48px; color: white; border: 1px solid rgba(197, 168, 128, 0.25); box-shadow: 0 20px 40px rgba(0,0,0,0.06);" id="contact">
+        <h3 style="font-family: 'Playfair Display', serif; font-size: 26px; margin-bottom: 12px; color: #fff;">Private Consultation</h3>
+        <p style="font-size: 14px; color: #a1a1aa; margin-bottom: 24px; line-height: 1.6;">
+            Looking for a specific reference or seeking to consign your luxury timepiece? Connect directly with our lead specialist.
+        </p>
+        
+        <form onsubmit="alert('Thank you for reaching out. Our concierge specialist will get in touch with you shortly.'); return false;">
+            <div class="form-group" style="margin-bottom: 14px;">
+                <label class="form-label" style="color: #e4e4e7;">Your Name</label>
+                <input type="text" class="form-control" style="background: #202024; border-color: #333; color: #fff;" placeholder="e.g. Atty. Roberto Santos" required>
+            </div>
+            <div class="form-group" style="margin-bottom: 14px;">
+                <label class="form-label" style="color: #e4e4e7;">Phone / Email</label>
+                <input type="text" class="form-control" style="background: #202024; border-color: #333; color: #fff;" placeholder="e.g. 0917-000-0000 / email@domain.com" required>
+            </div>
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label class="form-label" style="color: #e4e4e7;">Inquiry or Watch Model</label>
+                <textarea class="form-control" style="background: #202024; border-color: #333; color: #fff;" rows="2" placeholder="Tell us which watch you are searching for or inquiring about..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; background: var(--color-gold); color: #121212; font-weight: 600; padding: 12px;">
+                <i class="fas fa-paper-plane"></i> Submit Private Inquiry
+            </button>
+        </form>
+    </div>
+</section>
+{% endblock %}

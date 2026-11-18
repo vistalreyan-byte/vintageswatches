@@ -1,0 +1,143 @@
+{% extends "store/layout.html" %}
+
+{% block title %}Private Checkout - Vintage Watches{% endblock %}
+
+{% block content %}
+<div style="max-width: 1100px; margin: 0 auto; padding: 40px 24px 80px 24px;">
+
+    <div style="margin-bottom: 32px;">
+        <h1 style="font-family: 'Playfair Display', serif; font-size: 34px; margin: 0 0 8px 0; color: #121212;">
+            Private Checkout
+        </h1>
+        <p style="color: #71717a; font-size: 14px; margin: 0;">
+            Provide your recipient details to finalize your timepiece acquisition.
+        </p>
+    </div>
+
+    <form action="{{ url_for('checkout_process') }}" method="POST">
+        <div style="display: grid; grid-template-columns: 1.6fr 1.2fr; gap: 40px; align-items: flex-start;">
+            
+            <!-- Left: Client Information & Delivery -->
+            <div style="display: flex; flex-direction: column; gap: 28px;">
+                
+                <div style="background: #fff; padding: 32px; border-radius: 8px; border: 1px solid #ebebeb; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+                    <h3 style="font-family: 'Playfair Display', serif; font-size: 20px; margin: 0 0 20px 0; padding-bottom: 12px; border-bottom: 1px solid #eee;">
+                        1. Client Identification
+                    </h3>
+
+                    <div style="display: flex; flex-direction: column; gap: 16px;">
+                        <div class="form-group">
+                            <label class="form-label" for="c_fullname">Full Name *</label>
+                            <input type="text" name="full_name" id="c_fullname" class="form-control" placeholder="e.g. Atty. Miguel Santos" required>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                            <div class="form-group">
+                                <label class="form-label" for="c_email">Email Address *</label>
+                                <input type="email" name="email" id="c_email" class="form-control" placeholder="client@domain.com" required>
+                                <small style="color: #71717a; font-size: 11px;">Your receipt & tracking will be linked here.</small>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="c_phone">Mobile Number *</label>
+                                <input type="text" name="contact_number" id="c_phone" class="form-control" placeholder="0917-123-4567" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="c_address">Insured Delivery Address / Boutique Pickup *</label>
+                            <textarea name="address" id="c_address" class="form-control" rows="3" placeholder="Unit/Floor, Building, Street, Barangay, City, Province, Postal Code" required></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Method Selection -->
+                <div style="background: #fff; padding: 32px; border-radius: 8px; border: 1px solid #ebebeb; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+                    <h3 style="font-family: 'Playfair Display', serif; font-size: 20px; margin: 0 0 20px 0; padding-bottom: 12px; border-bottom: 1px solid #eee;">
+                        2. Settlement & Payment Method
+                    </h3>
+
+                    <div style="display: flex; flex-direction: column; gap: 14px;">
+                        <label style="display: flex; align-items: center; gap: 14px; padding: 14px 18px; border: 1px solid #e4e4e7; border-radius: 6px; cursor: pointer;">
+                            <input type="radio" name="payment_method" value="Bank Transfer" checked style="accent-color: var(--color-gold); transform: scale(1.2);">
+                            <div>
+                                <strong>Direct Bank Wire / Transfer</strong>
+                                <p style="margin: 2px 0 0 0; font-size: 12px; color: #71717a;">BDO / BPI / Metrobank Corporate Accounts (Instant Settlement)</p>
+                            </div>
+                        </label>
+
+                        <label style="display: flex; align-items: center; gap: 14px; padding: 14px 18px; border: 1px solid #e4e4e7; border-radius: 6px; cursor: pointer;">
+                            <input type="radio" name="payment_method" value="GCash" style="accent-color: var(--color-gold); transform: scale(1.2);">
+                            <div>
+                                <strong>GCash QR Settlement</strong>
+                                <p style="margin: 2px 0 0 0; font-size: 12px; color: #71717a;">Scan to pay verified merchant account</p>
+                            </div>
+                        </label>
+
+                        <label style="display: flex; align-items: center; gap: 14px; padding: 14px 18px; border: 1px solid #e4e4e7; border-radius: 6px; cursor: pointer;">
+                            <input type="radio" name="payment_method" value="Credit Card" style="accent-color: var(--color-gold); transform: scale(1.2);">
+                            <div>
+                                <strong>Credit / Debit Card Terminal</strong>
+                                <p style="margin: 2px 0 0 0; font-size: 12px; color: #71717a;">Visa / Mastercard / AMEX</p>
+                            </div>
+                        </label>
+
+                        <label style="display: flex; align-items: center; gap: 14px; padding: 14px 18px; border: 1px solid #e4e4e7; border-radius: 6px; cursor: pointer;">
+                            <input type="radio" name="payment_method" value="Cash" style="accent-color: var(--color-gold); transform: scale(1.2);">
+                            <div>
+                                <strong>Cash on Boutique Pickup / Hand Delivery</strong>
+                                <p style="margin: 2px 0 0 0; font-size: 12px; color: #71717a;">Inspect in person at our Makati showroom prior to turnover</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right: Order Review & Total -->
+            <div style="background: #fff; border-radius: 8px; border: 1px solid #ebebeb; padding: 28px; box-shadow: 0 4px 16px rgba(0,0,0,0.03); position: sticky; top: 100px;">
+                <h3 style="font-family: 'Playfair Display', serif; font-size: 20px; margin: 0 0 16px 0; padding-bottom: 12px; border-bottom: 1px solid #eee;">
+                    Order Summary
+                </h3>
+
+                <div style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px; max-height: 280px; overflow-y: auto;">
+                    {% for item in items %}
+                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px;">
+                        <div>
+                            <strong>{{ item.watch.brand }} {{ item.watch.model }}</strong>
+                            <div style="color: #71717a; font-size: 11px;">Qty: {{ item.quantity }} × ₱ {{ "{:,.2f}".format(item.watch.selling_price) }}</div>
+                        </div>
+                        <strong>₱ {{ "{:,.2f}".format(item.subtotal) }}</strong>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div style="border-top: 1px solid #eee; padding-top: 16px; margin-bottom: 12px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px;">
+                        <span style="color: #71717a;">Subtotal</span>
+                        <span>₱ {{ "{:,.2f}".format(total) }}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 16px; font-size: 14px;">
+                        <span style="color: #71717a;">Insured Express Transit</span>
+                        <span style="color: var(--color-success); font-weight: 600;">FREE</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding-top: 14px; border-top: 2px solid #121212; font-size: 22px; font-weight: 700;">
+                        <span>Total Due</span>
+                        <span style="color: var(--color-primary);">₱ {{ "{:,.2f}".format(total) }}</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; background: var(--color-gold); color: #121212; font-weight: 700; padding: 15px; font-size: 15px; border-radius: 4px; box-shadow: 0 6px 18px rgba(197,168,128,0.3); margin-top: 10px;">
+                    <i class="fas fa-lock" style="margin-right: 6px;"></i> Authorize & Confirm Purchase
+                </button>
+
+                <div style="margin-top: 20px; font-size: 12px; color: #71717a; line-height: 1.5; text-align: center;">
+                    <i class="fas fa-check-shield" style="color: var(--color-gold); margin-right: 4px;"></i>
+                    Inventory stock is automatically reserved upon order confirmation. Official receipt is immediately generated.
+                </div>
+            </div>
+
+        </div>
+    </form>
+
+</div>
+{% endblock %}

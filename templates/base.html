@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Vintage Watches - Management System{% endblock %}</title>
+    <!-- Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-messages">
+        {% for category, message in messages %}
+        <div class="flash-message {{ category }}">
+            {% if category == 'error' %}
+            <i class="fas fa-exclamation-circle" style="color: var(--color-danger);"></i>
+            {% elif category == 'success' %}
+            <i class="fas fa-check-circle" style="color: var(--color-success);"></i>
+            {% elif category == 'warning' %}
+            <i class="fas fa-exclamation-triangle" style="color: var(--color-warning);"></i>
+            {% else %}
+            <i class="fas fa-info-circle" style="color: var(--color-info);"></i>
+            {% endif %}
+            <span>{{ message }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="brand-logo">
+                    <i class="fas fa-gem"></i>
+                    <span>VINTAGE WATCHES</span>
+                </div>
+                <div style="font-size: 11px; color: var(--color-accent); letter-spacing: 1px; margin-top: 4px; text-transform: uppercase;">
+                    Business Management
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('dashboard') }}"
+                    class="nav-item {% if request.endpoint == 'dashboard' %}active{% endif %}">
+                    <i class="fas fa-chart-line"></i> <span>Dashboard</span>
+                </a>
+                <a href="{{ url_for('watches') }}"
+                    class="nav-item {% if request.endpoint == 'watches' %}active{% endif %}">
+                    <i class="fas fa-clock"></i> <span>Watches Catalog</span>
+                </a>
+                <a href="{{ url_for('inventory') }}"
+                    class="nav-item {% if request.endpoint == 'inventory' %}active{% endif %}">
+                    <i class="fas fa-boxes"></i> <span>Inventory & Stock</span>
+                </a>
+                <a href="{{ url_for('sales') }}" class="nav-item {% if request.endpoint == 'sales' %}active{% endif %}">
+                    <i class="fas fa-shopping-cart"></i> <span>Sales History</span>
+                </a>
+                <a href="{{ url_for('customers') }}"
+                    class="nav-item {% if request.endpoint == 'customers' %}active{% endif %}">
+                    <i class="fas fa-users"></i> <span>Customers</span>
+                </a>
+                <a href="{{ url_for('services') }}"
+                    class="nav-item {% if request.endpoint == 'services' %}active{% endif %}">
+                    <i class="fas fa-tools"></i> <span>Watch Services</span>
+                </a>
+                <a href="{{ url_for('investors') }}"
+                    class="nav-item {% if request.endpoint == 'investors' %}active{% endif %}">
+                    <i class="fas fa-hand-holding-usd"></i> <span>Investors</span>
+                </a>
+                <a href="{{ url_for('reports') }}"
+                    class="nav-item {% if request.endpoint == 'reports' %}active{% endif %}">
+                    <i class="fas fa-file-invoice-dollar"></i> <span>Reports & Exports</span>
+                </a>
+                {% if session.get('role') == 'Administrator' %}
+                <a href="{{ url_for('users') }}" class="nav-item {% if request.endpoint == 'users' %}active{% endif %}">
+                    <i class="fas fa-user-shield"></i> <span>Users & Staff</span>
+                </a>
+                {% endif %}
+
+                <div style="margin: 16px 12px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 16px;">
+                    <a href="{{ url_for('index') }}" target="_blank" class="nav-item" style="color: var(--color-accent); font-weight: 500;">
+                        <i class="fas fa-store"></i> <span>View Storefront</span>
+                        <i class="fas fa-external-link-alt" style="font-size: 11px; margin-left: auto;"></i>
+                    </a>
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        {{ session.get('full_name', 'U')[0].upper() }}
+                    </div>
+                    <div class="user-details">
+                        <span class="user-name">{{ session.get('full_name') }}</span>
+                        <span class="user-role">{{ session.get('role') }}</span>
+                    </div>
+                </div>
+                <a href="{{ url_for('logout') }}" class="logout-btn" title="Sign out">
+                    <i class="fas fa-sign-out-alt"></i>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-header">
+                <div class="header-left">
+                    <h1 class="page-title">{% block page_title %}Dashboard{% endblock %}</h1>
+                </div>
+                <div class="header-actions">
+                    {% block header_actions %}{% endblock %}
+                </div>
+            </header>
+
+            <div class="content-body">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+
+    <!-- Core Scripts -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>

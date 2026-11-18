@@ -1,0 +1,189 @@
+{% extends "store/layout.html" %}
+
+{% block title %}{{ watch.brand }} {{ watch.model }} - Vintage Watches{% endblock %}
+
+{% block content %}
+<div style="max-width: 1240px; margin: 0 auto; padding: 40px 24px 80px 24px;">
+
+    <!-- Breadcrumbs -->
+    <div style="margin-bottom: 24px; font-size: 13px; color: #71717a;">
+        <a href="{{ url_for('index') }}" style="color: #71717a; text-decoration: none;">Home</a>
+        <span style="margin: 0 8px;">/</span>
+        <a href="{{ url_for('shop_catalog') }}" style="color: #71717a; text-decoration: none;">Collection</a>
+        <span style="margin: 0 8px;">/</span>
+        <a href="{{ url_for('shop_catalog', brand=watch.brand) }}" style="color: #71717a; text-decoration: none;">{{ watch.brand }}</a>
+        <span style="margin: 0 8px;">/</span>
+        <span style="color: #121212; font-weight: 500;">{{ watch.model }}</span>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1.1fr; gap: 60px; align-items: flex-start; margin-bottom: 70px;">
+        
+        <!-- Left: Image Gallery Display -->
+        <div>
+            <div style="background: #141416; border-radius: 12px; height: 480px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.06);">
+                {% if watch.image %}
+                <img src="{{ url_for('static', filename='uploads/watches/' + watch.image) }}" alt="{{ watch.brand }} {{ watch.model }}" style="width: 100%; height: 100%; object-fit: cover;">
+                {% else %}
+                <div style="text-align: center; color: #fff;">
+                    <i class="fas fa-clock" style="font-size: 100px; color: var(--color-gold); filter: drop-shadow(0 0 20px rgba(197,168,128,0.3));"></i>
+                    <div style="font-size: 14px; color: #a1a1aa; margin-top: 16px; letter-spacing: 1px; text-transform: uppercase;">{{ watch.brand }} Horology</div>
+                </div>
+                {% endif %}
+
+                <div style="position: absolute; top: 16px; left: 16px;">
+                    <span class="badge" style="background: rgba(0,0,0,0.75); color: #fff; border: 1px solid rgba(255,255,255,0.2); font-size: 12px; padding: 6px 12px;">
+                        {{ watch.condition_status }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Trust Bar underneath Image -->
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 20px;">
+                <div style="background: #fff; padding: 14px 10px; border-radius: 6px; text-align: center; border: 1px solid #eee;">
+                    <i class="fas fa-shield-alt" style="color: var(--color-gold); font-size: 18px; margin-bottom: 4px;"></i>
+                    <div style="font-size: 11px; font-weight: 600; text-transform: uppercase;">100% Authentic</div>
+                </div>
+                <div style="background: #fff; padding: 14px 10px; border-radius: 6px; text-align: center; border: 1px solid #eee;">
+                    <i class="fas fa-medal" style="color: var(--color-gold); font-size: 18px; margin-bottom: 4px;"></i>
+                    <div style="font-size: 11px; font-weight: 600; text-transform: uppercase;">1-Yr Warranty</div>
+                </div>
+                <div style="background: #fff; padding: 14px 10px; border-radius: 6px; text-align: center; border: 1px solid #eee;">
+                    <i class="fas fa-truck" style="color: var(--color-gold); font-size: 18px; margin-bottom: 4px;"></i>
+                    <div style="font-size: 11px; font-weight: 600; text-transform: uppercase;">Free Shipping</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Watch Details & Purchase -->
+        <div>
+            <div style="font-size: 13px; text-transform: uppercase; letter-spacing: 2px; color: var(--color-gold); font-weight: 700; margin-bottom: 6px;">
+                {{ watch.brand }}
+            </div>
+            <h1 style="font-family: 'Playfair Display', serif; font-size: 38px; line-height: 1.2; margin: 0 0 10px 0; color: #121212;">
+                {{ watch.model }}
+            </h1>
+            <div style="font-size: 14px; color: #71717a; margin-bottom: 24px;">
+                Reference: <code style="background: rgba(0,0,0,0.05); padding: 3px 8px; border-radius: 4px;">{{ watch.reference_number }}</code>
+                <span style="margin: 0 8px;">•</span>
+                Era / Acquired: <strong>{{ watch.year_aquired }}</strong>
+            </div>
+
+            <div style="background: #fff; padding: 20px 24px; border-radius: 8px; border: 1px solid #ebebeb; margin-bottom: 28px; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <span style="font-size: 12px; text-transform: uppercase; color: #71717a;">Retail Price</span>
+                    <div style="font-size: 32px; font-weight: 700; color: #121212; line-height: 1.1;">
+                        ₱ {{ "{:,.2f}".format(watch.selling_price) }}
+                    </div>
+                </div>
+                <div>
+                    {% if watch.stock > 0 %}
+                    <span class="badge badge-success" style="font-size: 13px; padding: 8px 14px;">
+                        <i class="fas fa-check-circle" style="margin-right: 4px;"></i> Available ({{ watch.stock }} in stock)
+                    </span>
+                    {% else %}
+                    <span class="badge badge-danger" style="font-size: 13px; padding: 8px 14px;">
+                        <i class="fas fa-times-circle" style="margin-right: 4px;"></i> Currently Sold Out
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Description -->
+            <div style="margin-bottom: 30px;">
+                <h3 style="font-family: 'Playfair Display', serif; font-size: 18px; margin-bottom: 10px;">About This Timepiece</h3>
+                <p style="font-size: 14px; line-height: 1.7; color: #3f3f46;">
+                    {{ watch.description or 'A remarkable vintage timepiece meticulously verified by our master horologist team. The case displays sharp bevels and the mechanical caliber has been timed on a digital Witschi chronocomparator to ensure chronometric accuracy.' }}
+                </p>
+            </div>
+
+            <!-- Add to Cart & Buy Now Form -->
+            {% if watch.stock > 0 %}
+            <form action="{{ url_for('cart_add', watch_id=watch.watch_id) }}" method="POST" style="margin-bottom: 36px;">
+                <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 16px;">
+                    <label style="font-size: 14px; font-weight: 600; min-width: 70px;">Quantity:</label>
+                    <input type="number" name="quantity" value="1" min="1" max="{{ watch.stock }}" class="form-control" style="width: 100px; text-align: center; font-size: 16px; font-weight: 600;">
+                    <span style="font-size: 13px; color: #71717a;">(Max {{ watch.stock }} available)</span>
+                </div>
+
+                <div style="display: flex; gap: 14px;">
+                    <button type="submit" class="btn btn-outline" style="flex: 1; padding: 14px; font-size: 15px; font-weight: 600; justify-content: center;">
+                        <i class="fas fa-shopping-bag"></i> Add to Cart
+                    </button>
+                    <button type="submit" name="buy_now" value="1" class="btn btn-primary" style="flex: 1.2; padding: 14px; font-size: 15px; font-weight: 600; background: var(--color-gold); color: #121212; border-color: var(--color-gold); justify-content: center; box-shadow: 0 4px 14px rgba(197,168,128,0.3);">
+                        <i class="fas fa-bolt"></i> Instant Checkout
+                    </button>
+                </div>
+            </form>
+            {% else %}
+            <div style="background: #fee2e2; border: 1px solid #fca5a5; padding: 16px; border-radius: 6px; color: #991b1b; font-size: 14px; margin-bottom: 30px;">
+                <i class="fas fa-info-circle"></i> This vintage timepiece is currently out of stock. Contact our concierge at (02) 8123-4567 to request sourcing for this reference.
+            </div>
+            {% endif %}
+
+            <!-- Technical Specifications Table -->
+            <div style="border-top: 1px solid #e5e5e5; padding-top: 24px;">
+                <h3 style="font-family: 'Playfair Display', serif; font-size: 18px; margin-bottom: 16px;">Horological Specifications</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 13px;">
+                    <div style="padding: 10px; background: #fff; border-radius: 4px; border: 1px solid #f0f0f0;">
+                        <span style="color: #71717a; display: block; font-size: 11px; text-transform: uppercase;">Manufacturer</span>
+                        <strong>{{ watch.brand }}</strong>
+                    </div>
+                    <div style="padding: 10px; background: #fff; border-radius: 4px; border: 1px solid #f0f0f0;">
+                        <span style="color: #71717a; display: block; font-size: 11px; text-transform: uppercase;">Caliber / Movement</span>
+                        <strong>{{ watch.movement }}</strong>
+                    </div>
+                    <div style="padding: 10px; background: #fff; border-radius: 4px; border: 1px solid #f0f0f0;">
+                        <span style="color: #71717a; display: block; font-size: 11px; text-transform: uppercase;">Watch Category</span>
+                        <strong>{{ watch.watch_type }}</strong>
+                    </div>
+                    <div style="padding: 10px; background: #fff; border-radius: 4px; border: 1px solid #f0f0f0;">
+                        <span style="color: #71717a; display: block; font-size: 11px; text-transform: uppercase;">Condition Grade</span>
+                        <strong>{{ watch.condition_status }}</strong>
+                    </div>
+                    <div style="padding: 10px; background: #fff; border-radius: 4px; border: 1px solid #f0f0f0;">
+                        <span style="color: #71717a; display: block; font-size: 11px; text-transform: uppercase;">Reference Number</span>
+                        <strong>{{ watch.reference_number }}</strong>
+                    </div>
+                    <div style="padding: 10px; background: #fff; border-radius: 4px; border: 1px solid #f0f0f0;">
+                        <span style="color: #71717a; display: block; font-size: 11px; text-transform: uppercase;">Year Acquired / Era</span>
+                        <strong>{{ watch.year_aquired }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Watches Section -->
+    {% if related_watches %}
+    <div style="border-top: 1px solid #e5e5e5; padding-top: 50px;">
+        <h3 style="font-family: 'Playfair Display', serif; font-size: 26px; margin-bottom: 24px;">
+            More From {{ watch.brand }}
+        </h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px;">
+            {% for rw in related_watches %}
+            <div class="watch-card">
+                <div class="watch-card-img" style="height: 190px;">
+                    {% if rw.image %}
+                    <img src="{{ url_for('static', filename='uploads/watches/' + rw.image) }}" alt="{{ rw.brand }}">
+                    {% else %}
+                    <i class="fas fa-clock" style="font-size: 40px; color: var(--color-gold);"></i>
+                    {% endif %}
+                </div>
+                <div class="watch-card-body">
+                    <span class="watch-brand-tag">{{ rw.brand }}</span>
+                    <a href="{{ url_for('watch_detail', watch_id=rw.watch_id) }}" class="watch-card-title" style="font-size: 16px;">
+                        {{ rw.model }}
+                    </a>
+                    <div class="watch-card-price" style="margin-top: 10px;">
+                        ₱ {{ "{:,.2f}".format(rw.selling_price) }}
+                        <a href="{{ url_for('watch_detail', watch_id=rw.watch_id) }}" class="btn btn-sm btn-outline">Inspect</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

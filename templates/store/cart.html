@@ -1,0 +1,137 @@
+{% extends "store/layout.html" %}
+
+{% block title %}Shopping Cart - Vintage Watches{% endblock %}
+
+{% block content %}
+<div style="max-width: 1100px; margin: 0 auto; padding: 40px 24px 80px 24px;">
+    
+    <div style="margin-bottom: 32px;">
+        <h1 style="font-family: 'Playfair Display', serif; font-size: 34px; margin: 0 0 8px 0; color: #121212;">
+            Shopping Cart
+        </h1>
+        <p style="color: #71717a; font-size: 14px; margin: 0;">
+            Review your selected timepieces before proceeding to private checkout.
+        </p>
+    </div>
+
+    {% if items %}
+    <div style="display: grid; grid-template-columns: 1.8fr 1fr; gap: 40px; align-items: flex-start;">
+        
+        <!-- Cart Items Table -->
+        <div style="background: #fff; border-radius: 8px; border: 1px solid #ebebeb; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="background: #fafafa; border-bottom: 1px solid #eee;">
+                        <th style="padding: 14px 20px; text-align: left; font-size: 12px; text-transform: uppercase; color: #71717a;">Timepiece</th>
+                        <th style="padding: 14px 16px; text-align: center; font-size: 12px; text-transform: uppercase; color: #71717a;">Qty</th>
+                        <th style="padding: 14px 20px; text-align: right; font-size: 12px; text-transform: uppercase; color: #71717a;">Subtotal</th>
+                        <th style="padding: 14px 16px; width: 40px;"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr style="border-bottom: 1px solid #f0f0f0;">
+                        <td style="padding: 20px;">
+                            <div style="display: flex; gap: 16px; align-items: center;">
+                                <div style="width: 65px; height: 65px; border-radius: 6px; background: #141416; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    {% if item.watch.image %}
+                                    <img src="{{ url_for('static', filename='uploads/watches/' + item.watch.image) }}" alt="{{ item.watch.brand }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                    {% else %}
+                                    <i class="fas fa-clock" style="color: var(--color-gold); font-size: 24px;"></i>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <span style="font-size: 11px; text-transform: uppercase; color: var(--color-gold); font-weight: 700;">{{ item.watch.brand }}</span>
+                                    <a href="{{ url_for('watch_detail', watch_id=item.watch.watch_id) }}" style="display: block; font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 600; color: #121212; text-decoration: none;">
+                                        {{ item.watch.model }}
+                                    </a>
+                                    <div style="font-size: 12px; color: #71717a; margin-top: 2px;">
+                                        ₱ {{ "{:,.2f}".format(item.watch.selling_price) }} each • Stock: {{ item.stock }}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="padding: 20px; text-align: center;">
+                            <form action="{{ url_for('cart_update', watch_id=item.watch.watch_id) }}" method="POST" style="display: inline-flex; align-items: center; border: 1px solid #ddd; border-radius: 4px; overflow: hidden;">
+                                <button type="submit" name="quantity" value="{{ item.quantity - 1 }}" style="background: #fafafa; border: none; padding: 6px 10px; cursor: pointer; color: #555;">-</button>
+                                <input type="text" value="{{ item.quantity }}" readonly style="width: 36px; text-align: center; border: none; font-size: 13px; font-weight: 600; background: white;">
+                                <button type="submit" name="quantity" value="{{ item.quantity + 1 }}" {% if item.quantity >= item.stock %}disabled style="background: #eee; cursor: not-allowed;"{% else %}style="background: #fafafa; border: none; padding: 6px 10px; cursor: pointer; color: #555;"{% endif %}>+</button>
+                            </form>
+                        </td>
+                        <td style="padding: 20px; text-align: right;">
+                            <strong style="font-size: 15px; color: #121212;">₱ {{ "{:,.2f}".format(item.subtotal) }}</strong>
+                        </td>
+                        <td style="padding: 20px; text-align: center;">
+                            <form action="{{ url_for('cart_remove', watch_id=item.watch.watch_id) }}" method="POST">
+                                <button type="submit" style="background: none; border: none; color: #a1a1aa; cursor: pointer; font-size: 14px;" title="Remove from cart">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div style="padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; background: #fafafa;">
+                <a href="{{ url_for('shop_catalog') }}" class="btn btn-outline" style="font-size: 13px;">
+                    <i class="fas fa-arrow-left"></i> Continue Shopping
+                </a>
+                <form action="{{ url_for('cart_clear') }}" method="POST" onsubmit="return confirm('Clear all items from your cart?');">
+                    <button type="submit" class="btn btn-outline" style="color: var(--color-danger); border-color: rgba(217,83,79,0.3); font-size: 13px;">
+                        <i class="fas fa-trash"></i> Empty Cart
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Order Summary Box -->
+        <div style="background: #fff; border-radius: 8px; border: 1px solid #ebebeb; padding: 28px; box-shadow: 0 4px 16px rgba(0,0,0,0.03); position: sticky; top: 100px;">
+            <h3 style="font-family: 'Playfair Display', serif; font-size: 20px; margin: 0 0 20px 0; padding-bottom: 12px; border-bottom: 1px solid #eee;">
+                Order Summary
+            </h3>
+
+            <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px;">
+                <span style="color: #71717a;">Subtotal ({{ total_qty }} piece{{ 's' if total_qty > 1 else '' }})</span>
+                <strong>₱ {{ "{:,.2f}".format(total) }}</strong>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; margin-bottom: 16px; font-size: 14px;">
+                <span style="color: #71717a;">Armored Courier Delivery</span>
+                <span style="color: var(--color-success); font-weight: 600;">COMPLIMENTARY</span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; margin-bottom: 24px; padding-top: 14px; border-top: 2px solid #121212; font-size: 20px; font-weight: 700;">
+                <span>Total Due</span>
+                <span style="color: var(--color-primary);">₱ {{ "{:,.2f}".format(total) }}</span>
+            </div>
+
+            <a href="{{ url_for('checkout') }}" class="btn btn-primary" style="width: 100%; justify-content: center; background: var(--color-gold); color: #121212; font-weight: 700; padding: 14px; font-size: 15px; border-radius: 4px; box-shadow: 0 6px 18px rgba(197,168,128,0.25);">
+                Proceed to Checkout <i class="fas fa-arrow-right" style="margin-left: 8px;"></i>
+            </a>
+
+            <div style="margin-top: 20px; text-align: center; font-size: 12px; color: #71717a; line-height: 1.5;">
+                <i class="fas fa-lock" style="color: var(--color-gold); margin-right: 4px;"></i> Authenticated SME Transaction Guarantee
+            </div>
+        </div>
+
+    </div>
+    {% else %}
+    <div style="background: #fff; padding: 80px 24px; text-align: center; border-radius: 8px; border: 1px solid #ebebeb; max-width: 600px; margin: 40px auto;">
+        <div style="width: 80px; height: 80px; border-radius: 50%; background: #fafafa; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto;">
+            <i class="fas fa-shopping-bag" style="font-size: 32px; color: #d4d4d8;"></i>
+        </div>
+        <h2 style="font-family: 'Playfair Display', serif; font-size: 24px; margin-bottom: 10px; color: #121212;">
+            Your Shopping Cart is Empty
+        </h2>
+        <p style="color: #71717a; font-size: 14px; max-width: 400px; margin: 0 auto 28px auto; line-height: 1.6;">
+            Explore our curated catalog of rare Swiss and Japanese vintage timepieces and add your dream watch to your collection.
+        </p>
+        <a href="{{ url_for('shop_catalog') }}" class="btn btn-primary" style="background: var(--color-gold); color: #121212; font-weight: 600; padding: 12px 28px;">
+            <i class="fas fa-compass"></i> Browse Timepiece Catalog
+        </a>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

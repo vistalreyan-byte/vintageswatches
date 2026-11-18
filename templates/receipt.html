@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Official Receipt #{{ "%04d" | format(sale.sale_id) }} - Vintage Watches</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-primary: #121212;
+            --color-accent: #c5a880;
+            --color-border: #e5e5e5;
+            --font-sans: 'Inter', sans-serif;
+            --font-serif: 'Playfair Display', serif;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: #f5f5f4;
+            color: #222;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .receipt-card {
+            background: #fff;
+            width: 100%;
+            max-width: 780px;
+            padding: 48px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid #ebebeb;
+            position: relative;
+        }
+
+        .receipt-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 2px solid var(--color-primary);
+            padding-bottom: 24px;
+            margin-bottom: 30px;
+        }
+
+        .brand-title {
+            font-family: var(--font-serif);
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            color: var(--color-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-subtitle {
+            font-size: 12px;
+            color: #777;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 4px;
+        }
+
+        .receipt-meta {
+            text-align: right;
+        }
+
+        .invoice-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--color-primary);
+            margin-bottom: 4px;
+        }
+
+        .receipt-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 32px;
+        }
+
+        .info-box h4 {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #888;
+            letter-spacing: 0.5px;
+            margin: 0 0 8px 0;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 4px;
+        }
+
+        .info-box p {
+            margin: 3px 0;
+            font-size: 14px;
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+
+        .items-table th {
+            text-align: left;
+            padding: 12px 14px;
+            background: #fbfbfa;
+            border-top: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #555;
+        }
+
+        .items-table td {
+            padding: 16px 14px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+        }
+
+        .text-right { text-align: right !important; }
+        .text-center { text-align: center !important; }
+
+        .receipt-summary {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 36px;
+        }
+
+        .summary-box {
+            width: 320px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 14px;
+        }
+
+        .summary-row.total {
+            border-top: 2px solid var(--color-primary);
+            margin-top: 8px;
+            padding-top: 14px;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--color-primary);
+        }
+
+        .receipt-footer {
+            border-top: 1px dashed #ccc;
+            padding-top: 24px;
+            text-align: center;
+            font-size: 13px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .actions-bar {
+            margin-top: 24px;
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 10px 22px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #333;
+        }
+
+        .btn-outline {
+            background: white;
+            border-color: #ccc;
+            color: #333;
+        }
+
+        .btn-outline:hover {
+            border-color: #999;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .receipt-card {
+                box-shadow: none;
+                border: none;
+                padding: 0;
+                max-width: 100%;
+            }
+            .actions-bar {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="receipt-card">
+        <div class="receipt-header">
+            <div>
+                <div class="brand-title">
+                    <i class="fas fa-gem" style="color: var(--color-accent);"></i> VINTAGE WATCHES
+                </div>
+                <div class="brand-subtitle">
+                    Official Transaction Receipt & Certificate of Sale
+                </div>
+            </div>
+            <div class="receipt-meta">
+                <div class="invoice-title">RECEIPT #{{ "%04d" | format(sale.sale_id) }}</div>
+                <p style="margin: 4px 0; font-size: 13px; color: #666;">Date: {{ sale.sale_date }}</p>
+                <p style="margin: 0; font-size: 12px; color: #2e7d32; font-weight: 600;">STATUS: {{ sale.payment_status }}</p>
+            </div>
+        </div>
+
+        <div class="receipt-info-grid">
+            <div class="info-box">
+                <h4>Customer Details</h4>
+                <p><strong>{{ sale.customer_name }}</strong></p>
+                <p><i class="fas fa-phone-alt" style="font-size: 11px; color: var(--color-accent); margin-right: 4px;"></i> {{ sale.customer_phone }}</p>
+                <p><i class="fas fa-envelope" style="font-size: 11px; color: var(--color-accent); margin-right: 4px;"></i> {{ sale.customer_email }}</p>
+                <p><i class="fas fa-map-marker-alt" style="font-size: 11px; color: var(--color-accent); margin-right: 4px;"></i> {{ sale.customer_address }}</p>
+            </div>
+
+            <div class="info-box">
+                <h4>Transaction Reference</h4>
+                <p><strong>Payment Method:</strong> {{ sale.paymaent_method }}</p>
+                <p><strong>Handled By:</strong> {{ sale.staff_name or 'Online SME Storefront' }}</p>
+                <p><strong>Invoice ID:</strong> VW-{{ sale.sale_date.strftime('%Y%m') if sale.sale_date.strftime is defined else '2026' }}-{{ "%04d" | format(sale.sale_id) }}</p>
+                <p><strong>Currency:</strong> Philippine Peso (PHP ₱)</p>
+            </div>
+        </div>
+
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th>Item / Model</th>
+                    <th>Reference</th>
+                    <th class="text-center">Qty</th>
+                    <th class="text-right">Unit Price</th>
+                    <th class="text-right">Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>
+                        <strong>{{ item.brand }}</strong> - {{ item.model }}
+                        <div style="font-size: 12px; color: #777;">{{ item.watch_type }}</div>
+                    </td>
+                    <td><code>{{ item.reference_number }}</code></td>
+                    <td class="text-center">{{ item.quantity }}</td>
+                    <td class="text-right">₱ {{ "{:,.2f}".format(item.unit_price) }}</td>
+                    <td class="text-right"><strong>₱ {{ "{:,.2f}".format(item.subtotal) }}</strong></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="receipt-summary">
+            <div class="summary-box">
+                <div class="summary-row">
+                    <span>Subtotal:</span>
+                    <span>₱ {{ "{:,.2f}".format(sale.total_amount) }}</span>
+                </div>
+                <div class="summary-row">
+                    <span>Domestic Insured Shipping:</span>
+                    <span style="color: #2e7d32; font-weight: 500;">COMPLIMENTARY</span>
+                </div>
+                <div class="summary-row total">
+                    <span>Grand Total:</span>
+                    <span>₱ {{ "{:,.2f}".format(sale.total_amount) }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="receipt-footer">
+            <p><strong>Thank you for choosing Vintage Watches.</strong></p>
+            <p>All certified pre-owned timepieces are rigorously inspected for authenticity and precision. Backed by our standard 12-month SME mechanical warranty.</p>
+            <p style="font-size: 11px; color: #999; margin-top: 10px;">Vintage Watches Philippines • Inquiries: support@vintagewatches.com • (02) 8123-4567</p>
+        </div>
+
+        <div class="actions-bar">
+            <button onclick="window.print()" class="btn btn-primary">
+                <i class="fas fa-print"></i> Print Official Receipt
+            </button>
+            <button onclick="window.close(); if(history.length > 1) { history.back(); }" class="btn btn-outline">
+                <i class="fas fa-arrow-left"></i> Back
+            </button>
+        </div>
+    </div>
+
+</body>
+</html>

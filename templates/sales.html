@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+
+{% block title %}Sales History - Vintage Watches{% endblock %}
+{% block page_title %}Sales Transactions & History{% endblock %}
+
+{% block header_actions %}
+<button class="btn btn-primary" data-modal="newSaleModal">
+    <i class="fas fa-cash-register"></i> New In-Store Sale
+</button>
+{% endblock %}
+
+{% block content %}
+<div class="kpi-grid" style="grid-template-columns: repeat(2, 1fr);">
+    <div class="kpi-card">
+        <div class="kpi-header">
+            <span>Total Sales Volume</span>
+            <div class="kpi-icon"><i class="fas fa-coins"></i></div>
+        </div>
+        <div class="kpi-value">₱ {{ "{:,.2f}".format(total_sales_val) }}</div>
+    </div>
+    
+    <div class="kpi-card">
+        <div class="kpi-header">
+            <span>Settled / Paid Revenue</span>
+            <div class="kpi-icon" style="color: var(--color-success);"><i class="fas fa-check-circle"></i></div>
+        </div>
+        <div class="kpi-value" style="color: var(--color-success);">₱ {{ "{:,.2f}".format(paid_sales_val) }}</div>
+    </div>
+</div>
+
+<div class="filters-bar">
+    <form action="{{ url_for('sales') }}" method="GET" style="display: flex; gap: 16px; width: 100%; flex-wrap: wrap;">
+        <div class="search-input-wrapper" style="flex: 1; min-width: 220px;">
+            <i class="fas fa-search"></i>
+            <input type="text" name="search" class="form-control" placeholder="Search by customer, cashier, or payment method..." value="{{ search }}">
+        </div>
+        <div style="width: 170px;">
+            <input type="date" name="date_from" class="form-control" value="{{ date_from }}" title="Date From">
+        </div>
+        <div style="width: 170px;">
+            <input type="date" name="date_to" class="form-control" value="{{ date_to }}" title="Date To">
+        </div>
+        <div style="width: 170px;">
+            <select name="status" class="form-control" onchange="this.form.submit()">
+                <option value="">All Statuses</option>
+                <option value="Paid" {% if status_filter == 'Paid' %}selected{% endif %}>Paid</option>
+                <option value="Pending" {% if status_filter == 'Pending' %}selected{% endif %}>Pending</option>
+            </select>
+        </div>
+        {% if search or status_filter or date_from or date_to %}
+        <a href="{{ url_for('sales') }}" class="btn btn-outline">Clear</a>
+        {% endif %}
+    </form>
+</div>
+
+<div class="table-container">
+    <div class="table-header">
+        <h2 class="table-title">Sales Orders & Receipts ({{ sales | length }})</h2>
+    </div>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Receipt #</th>
+                <th>Transaction Date</th>
+                <th>Customer</th>
+                <th>Handled By</th>
+                <th>Total Amount</th>
+                <th>Payment Method</th>
+                <th>Status</th>
+                <th class="text-right">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sale in sales %}
+            <tr>
+                <td><strong>#{{ "%04d" | format(sale.sale_id) }}</strong></td>
+                <td>{{ sale.sale_date }}</td>
+                <td><strong>{{ sale.customer }}</strong></td>
+                <td>{{ sale.staff or 'Online Storefront' }}</td>
+                <td><strong style="font-size: 15px;">₱ {{ "{:,.2f}".format(sale.total_amount) }}</strong></td>
+                <td>
+                    <span style="font-size: 13px;"><i class="fas fa-credit-card" style="color: var(--color-accent); margin-right: 4px;"></i> {{ sale.paymaent_method }}</span>
+                </td>
+                <td>
+                    <span class="badge {% if sale.payment_status == 'Paid' %}badge-success{% else %}badge-warning{% endif %}">
+                        {{ sale.payment_status }}
+                    </span>
+                </td>
+                <td class="text-right">
+                    <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                        <a href="{{ url_for('view_receipt', sale_id=sale.sale_id) }}" target="_blank" class="btn btn-sm btn-outline" title="Print Official Receipt">
+                            <i class="fas fa-receipt"></i> Receipt
+                        </a>
+                        <button class="btn btn-sm btn-outline view-sale-details-btn" data-id="{{ sale.sale_id }}" title="View Itemized Details">
+                            <i class="fas fa-list-ul"></i> Details
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="8" class="text-center text-muted" style="padding: 40px;">No sales records found matching your filters.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- New In-Store Sale Modal -->
+<div class="modal-overlay" id="newSaleModal">
+    <div class="modal-content" style="max-width: 650px;">
+        <div class="modal-header">
+            <h3><i class="fas fa-cash-register" style="color: var(--color-accent); margin-right: 8px;"></i> Process In-Store Sale</h3>
+            <button class="modal-close">&times;</button>
+        </div>
+        <form action="{{ url_for('new_sale') }}" method="POST">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label" for="customer_id">Select Customer *</label>
+                    <select name="customer_id" id="customer_id" class="form-control" required>
+                        <option value="">-- Choose Customer --</option>
+                        {% for customer in customers %}
+                        <option value="{{ customer.customer_id }}">{{ customer.full_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="new_sale_watch">Select Timepiece *</label>
+                    <select name="watch_id" id="new_sale_watch" class="form-control" required>
+                        <option value="">-- Choose Timepiece --</option>
+                        {% for watch in available_watches %}
+                        <option value="{{ watch.watch_id }}" data-price="{{ watch.selling_price }}" data-stock="{{ watch.quantity }}">
+                            {{ watch.brand }} {{ watch.model }} (₱ {{ "{:,.2f}".format(watch.selling_price) }}) - Stock: {{ watch.quantity }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="detail-grid" style="margin-top: 20px;">
+                    <div class="form-group">
+                        <label class="form-label" for="new_sale_quantity">Quantity *</label>
+                        <input type="number" name="quantity" id="new_sale_quantity" class="form-control" value="1" min="1" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Total Amount</label>
+                        <div id="new_sale_total" style="font-size: 24px; font-weight: 700; color: var(--color-primary); margin-top: 4px;">
+                            ₱ 0.00
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="payment_method">Payment Method *</label>
+                        <select name="payment_method" id="payment_method" class="form-control" required>
+                            <option value="Cash">Cash</option>
+                            <option value="Bank Transfer">Bank Transfer</option>
+                            <option value="GCash">GCash</option>
+                            <option value="Credit Card">Credit Card</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="payment_status">Payment Status *</label>
+                        <select name="payment_status" id="payment_status" class="form-control" required>
+                            <option value="Paid">Paid</option>
+                            <option value="Pending">Pending</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" data-close-modal>Cancel</button>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-check"></i> Complete & Print Receipt</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Sale Details Modal -->
+<div class="modal-overlay" id="saleDetailsModal">
+    <div class="modal-content" style="max-width: 650px;">
+        <div class="modal-header">
+            <h3><i class="fas fa-receipt" style="color: var(--color-accent); margin-right: 8px;"></i> Transaction Breakdown <span id="sd_sale_id"></span></h3>
+            <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div style="background: rgba(0,0,0,0.03); padding: 16px; border-radius: 6px; margin-bottom: 20px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 13px;">
+                    <div><strong>Customer:</strong> <span id="sd_customer"></span></div>
+                    <div><strong>Handled By:</strong> <span id="sd_staff"></span></div>
+                    <div><strong>Date:</strong> <span id="sd_date"></span></div>
+                    <div><strong>Payment Method:</strong> <span id="sd_method"></span></div>
+                </div>
+            </div>
+
+            <h4 style="margin: 0 0 12px 0; font-size: 15px;">Purchased Items</h4>
+            <div id="sd_items_container">
+                <p class="text-muted">Loading items...</p>
+            </div>
+
+            <div style="margin-top: 20px; text-align: right; border-top: 1px solid var(--color-border); padding-top: 12px;">
+                <span style="font-size: 14px; color: var(--color-text-muted);">Total Settled:</span>
+                <span id="sd_total" style="font-size: 22px; font-weight: 700; color: var(--color-primary); margin-left: 10px;"></span>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a id="sd_receipt_link" href="#" target="_blank" class="btn btn-primary"><i class="fas fa-print"></i> Open Full Receipt</a>
+            <button class="btn btn-outline" data-close-modal>Close</button>
+        </div>
+    </div>
+</div>
+{% endblock %}

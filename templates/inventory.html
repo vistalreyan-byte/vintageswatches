@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block title %}Inventory & Stock - Vintage Watches{% endblock %}
+{% block page_title %}Inventory & Stock Management{% endblock %}
+
+{% block header_actions %}
+<button class="btn btn-primary" data-modal="addInventoryModal">
+    <i class="fas fa-plus"></i> Add Stock Entry
+</button>
+{% endblock %}
+
+{% block content %}
+<div class="filters-bar">
+    <form action="{{ url_for('inventory') }}" method="GET" style="display: flex; gap: 16px; width: 100%; flex-wrap: wrap;">
+        <div class="search-input-wrapper" style="flex: 1; min-width: 240px;">
+            <i class="fas fa-search"></i>
+            <input type="text" name="search" class="form-control" placeholder="Search by brand, model, reference, or location..." value="{{ search }}">
+        </div>
+        <div style="width: 200px;">
+            <select name="status" class="form-control" onchange="this.form.submit()">
+                <option value="">All Statuses</option>
+                <option value="In Stock" {% if status_filter == 'In Stock' %}selected{% endif %}>In Stock</option>
+                <option value="Out of Stock" {% if status_filter == 'Out of Stock' %}selected{% endif %}>Out of Stock</option>
+            </select>
+        </div>
+        {% if search or status_filter %}
+        <a href="{{ url_for('inventory') }}" class="btn btn-outline">Clear</a>
+        {% endif %}
+    </form>
+</div>
+
+<div class="table-container">
+    <div class="table-header">
+        <h2 class="table-title">Inventory Lots & Physical Locations ({{ inventory | length }})</h2>
+    </div>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Inv ID</th>
+                <th>Watch Brand & Model</th>
+                <th>Reference</th>
+                <th>Quantity in Stock</th>
+                <th>Storage / Cabinet Location</th>
+                <th>Date Logged</th>
+                <th>Inventory Status</th>
+                <th class="text-right">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in inventory %}
+            <tr>
+                <td>#{{ "%04d" | format(item.inventory_id) }}</td>
+                <td>
+                    <strong style="font-size: 15px;">{{ item.brand }}</strong><br>
+                    <span style="font-size: 13px; color: var(--color-text-muted);">{{ item.model }}</span>
+                </td>
+                <td><code style="background: rgba(0,0,0,0.04); padding: 2px 6px; border-radius: 4px;">{{ item.reference_number }}</code></td>
+                <td>
+                    <span style="font-size: 16px; font-weight: 700; color: {% if item.quantity <= 0 %}var(--color-danger){% elif item.quantity <= 2 %}var(--color-warning){% else %}var(--color-success){% endif %};">
+                        {{ item.quantity }}
+                    </span>
+                    <span style="font-size: 12px; color: var(--color-text-muted);">unit(s)</span>
+                </td>
+                <td>
+                    <i class="fas fa-map-marker-alt" style="color: var(--color-accent); margin-right: 4px;"></i>
+                    {{ item.location }}
+                </td>
+                <td>{{ item.date_added }}</td>
+                <td>
+                    {% if item.quantity <= 0 or item.inventory_status == 'Out of Stock' %}
+                        <span class="badge badge-danger">Out of Stock</span>
+                    {% elif item.quantity <= 2 %}
+                        <span class="badge badge-warning">Low Stock Warning</span>
+                    {% else %}
+                        <span class="badge badge-success">In Stock</span>
+                    {% endif %}
+                </td>
+                <td class="text-right">
+                    <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                        <button class="btn btn-sm btn-outline edit-inv-btn" data-id="{{ item.inventory_id }}" title="Edit stock level or location">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <form action="{{ url_for('inventory_delete', inventory_id=item.inventory_id) }}" method="POST" onsubmit="return confirm('Delete inventory record #{{ item.inventory_id }}?');" style="display: inline;">
+                            <button type="submit" class="btn btn-sm btn-outline" style="color: var(--color-danger); border-color: rgba(217,83,79,0.3);" title="Remove entry">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="8" class="text-center text-muted" style="padding: 40px;">No inventory records found matching your filters.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Add Inventory Modal -->
+<div class="modal-overlay" id="addInventoryModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-boxes" style="color: var(--color-accent); margin-right: 8px;"></i> Add Stock to Inventory</h3>
+            <button class="modal-close">&times;</button>
+        </div>
+        <form action="{{ url_for('inventory_add') }}" method="POST">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label" for="add_inv_watch">Select Timepiece *</label>
+                    <select name="watch_id" id="add_inv_watch" class="form-control" required>
+                        <option value="">-- Choose Timepiece --</option>
+                        {% for w in watches %}
+                        <option value="{{ w.watch_id }}">{{ w.brand }} {{ w.model }} (Ref: {{ w.reference_number }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="add_inv_qty">Quantity to Add *</label>
+                    <input type="number" name="quantity" id="add_inv_qty" class="form-control" value="1" min="1" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="add_inv_loc">Storage Location / Cabinet *</label>
+                    <input type="text" name="location" id="add_inv_loc" class="form-control" value="Display Cabinet A" placeholder="e.g. Display Cabinet B, Vault Safe #2" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" data-close-modal>Cancel</button>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-check"></i> Add Stock</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Inventory Modal -->
+<div class="modal-overlay" id="editInventoryModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-edit" style="color: var(--color-accent); margin-right: 8px;"></i> Edit Stock Lot</h3>
+            <button class="modal-close">&times;</button>
+        </div>
+        <form id="editInventoryForm" method="POST">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Timepiece</label>
+                    <div id="ei_watch_name" style="font-weight: 600; font-size: 15px; margin-top: 4px; padding: 10px; background: rgba(0,0,0,0.03); border-radius: 4px;"></div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="ei_quantity">Stock Quantity *</label>
+                    <input type="number" name="quantity" id="ei_quantity" class="form-control" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="ei_location">Storage Location *</label>
+                    <input type="text" name="location" id="ei_location" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="ei_status">Inventory Status</label>
+                    <select name="inventory_status" id="ei_status" class="form-control">
+                        <option value="In Stock">In Stock</option>
+                        <option value="Out of Stock">Out of Stock</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" data-close-modal>Cancel</button>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

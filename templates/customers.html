@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block title %}Customers - Vintage Watches{% endblock %}
+{% block page_title %}Customer Management{% endblock %}
+
+{% block header_actions %}
+<button class="btn btn-primary" data-modal="addCustomerModal">
+    <i class="fas fa-user-plus"></i> Add Customer
+</button>
+{% endblock %}
+
+{% block content %}
+<div class="filters-bar">
+    <form action="{{ url_for('customers') }}" method="GET" style="display: flex; gap: 16px; width: 100%;">
+        <div class="search-input-wrapper">
+            <i class="fas fa-search"></i>
+            <input type="text" name="search" class="form-control" placeholder="Search by name, email, phone, or address..." value="{{ search }}">
+        </div>
+        <button type="submit" class="btn btn-outline">Search</button>
+        {% if search %}
+        <a href="{{ url_for('customers') }}" class="btn btn-outline">Clear</a>
+        {% endif %}
+    </form>
+</div>
+
+<div class="table-container">
+    <div class="table-header">
+        <h2 class="table-title">Customer Directory & Client Profiles ({{ customers | length }})</h2>
+    </div>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Full Name</th>
+                <th>Contact Details</th>
+                <th>Delivery / Billing Address</th>
+                <th>Classification</th>
+                <th>Total Purchases</th>
+                <th>Registered</th>
+                <th class="text-right">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for customer in customers %}
+            <tr>
+                <td>#{{ "%04d" | format(customer.customer_id) }}</td>
+                <td>
+                    <strong style="font-size: 15px;">{{ customer.full_name }}</strong>
+                </td>
+                <td>
+                    <div><i class="fas fa-phone-alt" style="font-size: 11px; color: var(--color-accent); margin-right: 4px;"></i> {{ customer.contact_number }}</div>
+                    <div><i class="fas fa-envelope" style="font-size: 11px; color: var(--color-accent); margin-right: 4px;"></i> {{ customer.email }}</div>
+                </td>
+                <td>
+                    <span style="font-size: 13px; color: var(--color-text-muted);">{{ customer.address }}</span>
+                </td>
+                <td>
+                    <span class="badge {% if customer.customer_type == 'VIP' %}badge-accent{% else %}badge-neutral{% endif %}"
+                          {% if customer.customer_type == 'VIP' %}style="background: rgba(197, 168, 128, 0.2); color: #8c6d3b; font-weight: 600;"{% endif %}>
+                        {{ customer.customer_type }}
+                    </span>
+                </td>
+                <td>
+                    <strong>₱ {{ "{:,.2f}".format(customer.total_spent) }}</strong><br>
+                    <small style="color: var(--color-text-muted);">{{ customer.total_orders }} order(s)</small>
+                </td>
+                <td>{{ customer.date_registered }}</td>
+                <td class="text-right">
+                    <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                        <button class="btn btn-sm btn-outline view-customer-history-btn" data-id="{{ customer.customer_id }}" title="View purchase and service history">
+                            <i class="fas fa-history"></i> History
+                        </button>
+                        <button class="btn btn-sm btn-outline edit-customer-btn" data-id="{{ customer.customer_id }}" title="Edit customer details">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <form action="{{ url_for('customer_delete', customer_id=customer.customer_id) }}" method="POST" onsubmit="return confirm('Are you sure you want to remove customer {{ customer.full_name }}?');" style="display: inline;">
+                            <button type="submit" class="btn btn-sm btn-outline" style="color: var(--color-danger); border-color: rgba(217,83,79,0.3);" title="Delete customer">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="8" class="text-center text-muted" style="padding: 40px;">No customers found matching your criteria.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Add Customer Modal -->
+<div class="modal-overlay" id="addCustomerModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-user-plus" style="color: var(--color-accent); margin-right: 8px;"></i> Add New Customer</h3>
+            <button class="modal-close">&times;</button>
+        </div>
+        <form action="{{ url_for('customer_add') }}" method="POST">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label" for="add_c_name">Full Name *</label>
+                    <input type="text" name="full_name" id="add_c_name" class="form-control" placeholder="e.g. Carlos Mendoza" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="add_c_phone">Contact Number *</label>
+                    <input type="text" name="contact_number" id="add_c_phone" class="form-control" placeholder="e.g. 09171234567" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="add_c_email">Email Address *</label>
+                    <input type="email" name="email" id="add_c_email" class="form-control" placeholder="e.g. carlos@gmail.com" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="add_c_address">Complete Address *</label>
+                    <textarea name="address" id="add_c_address" class="form-control" rows="2" placeholder="Street, Barangay, City, Province" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="add_c_type">Customer Classification</label>
+                    <select name="customer_type" id="add_c_type" class="form-control">
+                        <option value="Regular" selected>Regular</option>
+                        <option value="VIP">VIP Collector</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" data-close-modal>Cancel</button>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-check"></i> Register Customer</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Customer Modal -->
+<div class="modal-overlay" id="editCustomerModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-user-edit" style="color: var(--color-accent); margin-right: 8px;"></i> Edit Customer Details</h3>
+            <button class="modal-close">&times;</button>
+        </div>
+        <form id="editCustomerForm" method="POST">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label" for="ec_name">Full Name *</label>
+                    <input type="text" name="full_name" id="ec_name" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="ec_phone">Contact Number *</label>
+                    <input type="text" name="contact_number" id="ec_phone" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="ec_email">Email Address *</label>
+                    <input type="email" name="email" id="ec_email" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="ec_address">Address *</label>
+                    <textarea name="address" id="ec_address" class="form-control" rows="2" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="ec_type">Classification</label>
+                    <select name="customer_type" id="ec_type" class="form-control">
+                        <option value="Regular">Regular</option>
+                        <option value="VIP">VIP</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" data-close-modal>Cancel</button>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Customer History Modal -->
+<div class="modal-overlay" id="customerHistoryModal">
+    <div class="modal-content" style="max-width: 750px;">
+        <div class="modal-header">
+            <h3><i class="fas fa-id-card" style="color: var(--color-accent); margin-right: 8px;"></i> <span id="ch_title">Customer Profile & History</span></h3>
+            <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div style="background: rgba(0,0,0,0.03); padding: 16px; border-radius: 6px; margin-bottom: 20px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 13px;">
+                    <div><strong>Email:</strong> <span id="ch_email"></span></div>
+                    <div><strong>Phone:</strong> <span id="ch_phone"></span></div>
+                    <div><strong>Classification:</strong> <span id="ch_type" class="badge badge-neutral"></span></div>
+                    <div><strong>Date Registered:</strong> <span id="ch_reg"></span></div>
+                    <div style="grid-column: span 2;"><strong>Address:</strong> <span id="ch_address"></span></div>
+                </div>
+            </div>
+
+            <h4 style="margin: 16px 0 8px 0; font-size: 15px;"><i class="fas fa-shopping-bag" style="color: var(--color-accent); margin-right: 6px;"></i> Purchase Transactions</h4>
+            <div id="ch_orders_container">
+                <p class="text-muted" style="font-size: 13px;">Loading orders...</p>
+            </div>
+
+            <h4 style="margin: 24px 0 8px 0; font-size: 15px;"><i class="fas fa-wrench" style="color: var(--color-accent); margin-right: 6px;"></i> Watch Service Orders</h4>
+            <div id="ch_services_container">
+                <p class="text-muted" style="font-size: 13px;">Loading service jobs...</p>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" data-close-modal>Close</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
